@@ -2,12 +2,15 @@
 import re
 
 def huffman_code(huffman, x, code=''):
-	if ('left' in huffman) and (x in huffman['left']['chars']):		
+	if ('0' in huffman) and (x in huffman['0']['chars']):		
 		code += '0'
-		return huffman_code(huffman['left'], x, code)
-	elif ('right' in huffman) and (x in huffman['right']['chars']):
+		return huffman_code(huffman['0'], x, code)
+	elif ('1' in huffman) and (x in huffman['1']['chars']):
 		code += '1'
-		return huffman_code(huffman['right'], x, code)
+		return huffman_code(huffman['1'], x, code)
+	elif ('2' in huffman) and (x in huffman['2']['chars']):
+		code += '2'
+		return huffman_code(huffman['2'],x,code)
 	else:
 		return code
 
@@ -24,10 +27,45 @@ def huffman_decode(encoded, huffman_table_inv):
 	return decoded
 
 
+def dna_encode(trits_code):
+	dna_table = {
+		'A': ['C', 'G', 'T'],
+		'C': ['G', 'T', 'A'],
+		'G': ['T', 'A', 'C'],
+		'T': ['A', 'C', 'G']
+	}
+	last = 'A'
+	encoded = ""
+	for t in trits_code:
+		last = dna_table[last][int(t)]
+		encoded += last
+
+	return encoded
+
+
+def dna_decode(dna_code):
+	dna_table = {
+		'A': ['C', 'G', 'T'],
+		'C': ['G', 'T', 'A'],
+		'G': ['T', 'A', 'C'],
+		'T': ['A', 'C', 'G']
+	}
+
+	last = 'A'
+	trits_code = ''
+	for g in dna_code:
+		t = dna_table[last].index(g)
+		trits_code += str(t)
+		last = g
+
+	return trits_code
 
 
 
-source = "hello, world"
+
+
+
+source = open('1984.txt', 'r').read()
 
 freq = {}
 
@@ -36,6 +74,9 @@ for c in source:
 		freq[c] += 1
 	else:
 		freq[c] = 1
+
+if (len(freq.keys()) % 2) == 0:
+	freq[''] = 0
 
 #print(freq)
 
@@ -54,7 +95,9 @@ while (len(huffman_queue) > 1):
 	#print(n1)
 	n2 = huffman_queue.pop()
 	#print(n2)
-	n = {'chars': n1['chars']+n2['chars'], 'f': n1['f']+n2['f'], 'left': n1, 'right': n2}
+	n3 = huffman_queue.pop()
+	#print(n3)
+	n = {'chars': n1['chars']+n2['chars']+n3['chars'], 'f': n1['f']+n2['f']+n3['f'], '0': n1, '1': n2, '2':n3}
 	#print(n)
 	huffman_queue.append(n)
 	#print(huffman_queue)
@@ -73,12 +116,18 @@ for k in freq.keys():
 	huffman_table[k] = code
 	huffman_table_inv[code] = k
 
-print(huffman_table)
-print(huffman_table_inv)
+#print(huffman_table)
+#print(huffman_table_inv)
 
 encoded = huffman_encode(source, huffman_table)
+
+encoded = dna_encode(encoded)
 print(encoded)
 
+open('1984_dna.txt', 'w').write(encoded)
 
-decoded = huffman_decode(encoded, huffman_table_inv)
+huffman_encoded = dna_decode(encoded)
+print(huffman_encoded)
+
+decoded = huffman_decode(huffman_encoded, huffman_table_inv)
 print(decoded)
