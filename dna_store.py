@@ -1,4 +1,14 @@
 
+def huffman_code(huffman, x, code=''):
+	if ('left' in huffman) and (x in huffman['left']['chars']):		
+		code += '0'
+		return huffman_code(huffman['left'], x, code)
+	elif ('right' in huffman) and (x in huffman['right']['chars']):
+		code += '1'
+		return huffman_code(huffman['right'], x, code)
+	else:
+		return code
+
 source = "hello, world"
 
 freq = {}
@@ -32,5 +42,7 @@ while (len(huffman_queue) > 1):
 	#print(huffman_queue)
 
 
-huffman_tree = huffman_queue
-print(huffman_tree)
+huffman_tree = huffman_queue[0]
+#print(huffman_tree)
+
+print(huffman_code(huffman_tree, 'o'))
