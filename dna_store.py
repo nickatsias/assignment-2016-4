@@ -3,6 +3,7 @@ import argparse
 import csv
 import re
 
+
 def huffman_code(huffman, x, code=''):
 	if ('0' in huffman) and (x in huffman['0']['chars']):		
 		code += '0'
@@ -19,6 +20,7 @@ def huffman_code(huffman, x, code=''):
 
 def huffman_encode(source, huffman_table):
  	return ''.join(list(map(lambda c: huffman_table[c], source)))
+
 
 def huffman_decode(encoded, huffman_table_inv):
 	codes = '|'.join(huffman_table_inv.keys())
@@ -63,23 +65,12 @@ def dna_decode(dna_code):
 	return trits_code
 
 
-def print_huffman_tree(parent_nodes):
-	children_nodes = []
-	for node in parent_nodes:
-		print(' [' + node['chars'].replace('\n', chr(182), 1) + ']' + str(node['f']) + ' ', end='')
-		if '0' in node:
-			children_nodes.append(node['0'])
-			children_nodes.append(node['1'])
-			children_nodes.append(node['2'])
-	print()
-	if len(children_nodes) > 0:
-		print_huffman_tree(children_nodes)
-
 
 
 source = open('1984.txt', 'r').read()
 
 freq = {}
+
 
 for c in source:
 	if c in freq:
@@ -95,10 +86,12 @@ if (len(freq.keys()) % 2) == 0:
 
 huffman_queue = []
 
+
 for k in freq.keys():
 	huffman_queue.append({'chars': k, 'f': freq[k]})
 
 #print(huffman_queue)
+
 
 while (len(huffman_queue) > 1):
 	huffman_queue = sorted(huffman_queue, key=lambda value: value['f'], reverse=True)
@@ -116,7 +109,6 @@ while (len(huffman_queue) > 1):
 
 
 huffman_tree = huffman_queue[0]
-#print_huffman_tree(huffman_tree)
 
 #print(huffman_code(huffman_tree, 'o'))
 
@@ -133,9 +125,9 @@ for k in freq.keys():
 #print(huffman_table_inv)
 
 encoded = huffman_encode(source, huffman_table)
-
 encoded = dna_encode(encoded)
 print(encoded)
+
 
 with open('1984_enc.txt', 'w') as fo:
 	fo.write(encoded)
@@ -147,6 +139,7 @@ with open('1984_huffman.csv', 'w', newline='') as fo:
     for k in huffman_table.keys():
     	csv_writer.writerow([k, huffman_table[k]])
     fo.close()
+
 
 huffman_encoded = dna_decode(encoded)
 print(huffman_encoded)
