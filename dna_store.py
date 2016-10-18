@@ -1,4 +1,6 @@
 
+import argparse
+import csv
 import re
 
 def huffman_code(huffman, x, code=''):
@@ -61,7 +63,17 @@ def dna_decode(dna_code):
 	return trits_code
 
 
-
+def print_huffman_tree(parent_nodes):
+	children_nodes = []
+	for node in parent_nodes:
+		print(' [' + node['chars'].replace('\n', chr(182), 1) + ']' + str(node['f']) + ' ', end='')
+		if '0' in node:
+			children_nodes.append(node['0'])
+			children_nodes.append(node['1'])
+			children_nodes.append(node['2'])
+	print()
+	if len(children_nodes) > 0:
+		print_huffman_tree(children_nodes)
 
 
 
@@ -104,7 +116,7 @@ while (len(huffman_queue) > 1):
 
 
 huffman_tree = huffman_queue[0]
-#print(huffman_tree)
+#print_huffman_tree(huffman_tree)
 
 #print(huffman_code(huffman_tree, 'o'))
 
@@ -112,9 +124,10 @@ huffman_tree = huffman_queue[0]
 huffman_table = {}
 huffman_table_inv = {}
 for k in freq.keys():
-	code = huffman_code(huffman_tree, k)
-	huffman_table[k] = code
-	huffman_table_inv[code] = k
+	if k != '':
+		code = huffman_code(huffman_tree, k)
+		huffman_table[k] = code
+		huffman_table_inv[code] = k
 
 #print(huffman_table)
 #print(huffman_table_inv)
@@ -124,10 +137,30 @@ encoded = huffman_encode(source, huffman_table)
 encoded = dna_encode(encoded)
 print(encoded)
 
-open('1984_dna.txt', 'w').write(encoded)
+with open('1984_enc.txt', 'w') as fo:
+	fo.write(encoded)
+	fo.close()
+
+
+with open('1984_huffman.csv', 'w', newline='') as fo:
+    csv_writer = csv.writer(fo, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    for k in huffman_table.keys():
+    	csv_writer.writerow([k, huffman_table[k]])
+    fo.close()
 
 huffman_encoded = dna_decode(encoded)
 print(huffman_encoded)
+
+
+huffman_table_inv2 = {}
+with open('1984_huffman.csv', 'r', newline='') as fo:
+    csv_reader = csv.reader(fo, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    for row in csv_reader:
+        huffman_table_inv2[row[1]] = row[0]
+
+
+print(huffman_table_inv2)
+
 
 decoded = huffman_decode(huffman_encoded, huffman_table_inv)
 print(decoded)
